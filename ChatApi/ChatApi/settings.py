@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,6 +24,10 @@ SECRET_KEY = 'django-insecure-o%x+bw82d&fso2bs#8%#$37u78uq$q5$tn7u*04x1njt@v%shv
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
 ALLOWED_HOSTS = []
 
 
@@ -37,10 +40,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'rest_framework',
+    'rest_framework_nested',
+    'cloudinary',
+    'cloudinary_storage',
+
+
+    'core',
+    'Chat',
 ]
 
 MIDDLEWARE = [
@@ -54,6 +66,34 @@ MIDDLEWARE = [
 
     "allauth.account.middleware.AccountMiddleware",
 ]
+
+AUTH_USER_MODEL = 'core.User'
+
+
+# Cloudinary settings
+cloudinary.config( 
+    cloud_name = 'duijznyhu',
+    api_key='246539365223599',
+    api_secret='uLwiYLpshMxhNuJDroOjcAFMmlc',
+)
+REST_FRAMEWORK = {
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+    ],
+    "DEFAULT_PARSER_CLASSES": [
+        "rest_framework.parsers.JSONParser",
+        "rest_framework.parsers.FormParser",
+        "rest_framework.parsers.MultiPartParser",
+    ],
+}
+
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 ROOT_URLCONF = 'ChatApi.urls'
 
@@ -83,13 +123,14 @@ AUTHENTICATION_BACKENDS = (
 WSGI_APPLICATION = 'ChatApi.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'chatapp',
+        'USER': 'postgres',
+        'PASSWORD': '1234',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 SOCIALACCOUNT_PROVIDERS = {
@@ -104,6 +145,7 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+
 
 
 # Password validation
