@@ -24,6 +24,10 @@ SECRET_KEY = 'django-insecure-o%x+bw82d&fso2bs#8%#$37u78uq$q5$tn7u*04x1njt@v%shv
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
 ALLOWED_HOSTS = []
 
 
@@ -36,15 +40,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-
+    'rest_framework',
+    'rest_framework_nested',
     'cloudinary',
     'cloudinary_storage',
 
+
     'core',
+    'Chat',
 ]
 
 MIDDLEWARE = [
@@ -63,13 +71,24 @@ AUTH_USER_MODEL = 'core.User'
 
 
 # Cloudinary settings
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'duijznyhu',
-    'API_KEY': '246539365223599',
-    'API_SECRET': 'uLwiYLpshMxhNuJDroOjcAFMmlc',
+cloudinary.config( 
+    cloud_name = 'duijznyhu',
+    api_key='246539365223599',
+    api_secret='uLwiYLpshMxhNuJDroOjcAFMmlc',
+)
+REST_FRAMEWORK = {
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+    ],
+    "DEFAULT_PARSER_CLASSES": [
+        "rest_framework.parsers.JSONParser",
+        "rest_framework.parsers.FormParser",
+        "rest_framework.parsers.MultiPartParser",
+    ],
 }
 
-# Tell Django to use Cloudinary for file storage
+
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 
@@ -104,9 +123,6 @@ AUTHENTICATION_BACKENDS = (
 WSGI_APPLICATION = 'ChatApi.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -130,7 +146,7 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-SITE_ID = 1
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
