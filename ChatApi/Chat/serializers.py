@@ -1,17 +1,37 @@
 from rest_framework import serializers
 from .models import Chat, Message
+from typing import Optional
 
 class ChatSerializer(serializers.ModelSerializer):
+    queryset = Message.objects.all()
+    last_message = serializers.SerializerMethodField()
+    unread_count = serializers.SerializerMethodField()
+    last_message_time = serializers.SerializerMethodField()
+    
+    def get_last_message(self, obj):    
+        return self.queryset.last().content if self.queryset.last() else None
+    
+
+    def get_unread_count(self, obj) -> int:
+        return obj.messages.filter(is_read=False).count()
+    
+    def get_last_message_time(self, obj) -> Optional[str]:
+        last_msg = obj.messages.last()
+        return last_msg.created_at.strftime('%Y-%m-%d %H:%M') if last_msg else None
+    
     class Meta:
         model = Chat
-        fields = '__all__'
-
+        fields = ['id', 'user1_id', 'user2_id', 'last_message', 'unread_count', 'last_message_time']
+    
+   
 class intiatChatSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chat
-        fields = '__all__'
+        fields = ['id' , 'user1_id' , 'user2_id']
+        read_only_fields = ['id' , 'user1_id']
     def create(self, validated_data):
-        user1_id = validated_data.pop('user1_id')
+        last_chat = ""
+        user1_id = self.context['request'].user
         user2_id = validated_data.pop('user2_id')
         user1_id , user2_id = sorted([user1_id , user2_id] , key = lambda u: u.id)
 
