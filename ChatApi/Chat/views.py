@@ -18,7 +18,9 @@ class ChatViewSet(viewsets.ModelViewSet):
 
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer # Default serializer for other actions (list, retrieve)
-    
+  
+
+
     def get_queryset(self):
         # Filter messages by the chat_pk from the URL
         chat_pk = self.kwargs['chat_pk']
