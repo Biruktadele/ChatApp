@@ -28,8 +28,7 @@ import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -47,6 +46,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'rest_framework',
     'rest_framework_nested',
+    
     'cloudinary',
     'cloudinary_storage',
 
@@ -89,7 +89,7 @@ REST_FRAMEWORK = {
 }
 
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 
 MEDIA_URL = '/media/'
@@ -122,7 +122,10 @@ AUTHENTICATION_BACKENDS = (
 
 WSGI_APPLICATION = 'ChatApi.wsgi.application'
 
+STATIC_URL = 'static/'
 
+# Add this line to define the directory for collected static files
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -183,6 +186,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
