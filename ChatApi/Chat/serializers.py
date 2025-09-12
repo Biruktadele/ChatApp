@@ -3,13 +3,13 @@ from .models import Chat, Message
 from typing import Optional
 
 class ChatSerializer(serializers.ModelSerializer):
-    queryset = Message.objects.all()
     last_message = serializers.SerializerMethodField()
     unread_count = serializers.SerializerMethodField()
     last_message_time = serializers.SerializerMethodField()
     
-    def get_last_message(self, obj):    
-        return self.queryset.last().content if self.queryset.last() else None
+    def get_last_message(self, obj):
+        last_msg = obj.messages.last()
+        return last_msg.content if last_msg else None
     
 
     def get_unread_count(self, obj) -> int:
