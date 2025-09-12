@@ -9,7 +9,9 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import os
+import dj_database_url
+import cloudinary
 from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,16 +21,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-o%x+bw82d&fso2bs#8%#$37u78uq$q5$tn7u*04x1njt@v%shv'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-o%x+bw82d&fso2bs#8%#$37u78uq$q5$tn7u*04x1njt@v%shv')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
-import cloudinary
-import cloudinary.uploader
-import cloudinary.api
-
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = []
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # Application definition
 
@@ -38,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'whitenoise.runserver_nostatic',  # Add this for serving static files
     'django.contrib.staticfiles',
     
     'allauth',
@@ -57,6 +59,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Add this
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -72,9 +75,9 @@ AUTH_USER_MODEL = 'core.User'
 
 # Cloudinary settings
 cloudinary.config( 
-    cloud_name = 'duijznyhu',
-    api_key='246539365223599',
-    api_secret='uLwiYLpshMxhNuJDroOjcAFMmlc',
+    cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.environ.get('CLOUDINARY_API_KEY'),
+    api_secret=os.environ.get('CLOUDINARY_API_SECRET'),
 )
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": [
@@ -121,34 +124,19 @@ AUTHENTICATION_BACKENDS = (
 
 
 WSGI_APPLICATION = 'ChatApi.wsgi.application'
+ASGI_APPLICATION = 'ChatApi.asgi.application' # Add this for ASGI server
 
-STATIC_URL = 'static/'
 
-# Add this line to define the directory for collected static files
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+# Database
+# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'chatapp',
-        'USER': 'postgres',
-        'PASSWORD': '1234',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+    'default': dj_database_url.config(
+        # Feel free to alter this value to suit your needs.
+        default='sqlite:///db.sqlite3',
+        conn_max_age=600
+    )
 }
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        # For each OAuth based provider, either add a ``SocialApp``
-        # (``socialaccount`` app) containing the required client
-        # credentials, or list them here:
-        'APP': {
-            'client_id': '123',
-            'secret': '456',
-            'key': ''
-        }
-    }
-}
-
 
 
 # Password validation
@@ -186,7 +174,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Enable WhiteNoise storage
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
