@@ -30,7 +30,6 @@ channels_redis==4.3.0
 charset-normalizer==3.4.1
 click==8.1.7
 cloudinary==1.44.1
-cockpit @ file:///builddir/build/BUILD/cockpit-344-build/cockpit-344/tmp/wheel/cockpit-344-py3-none-any.whl#sha256=6c0da7c2cbfb1207f38f238b3011ff193c786540a0404088b52184bb35356ba0
 crypt_r==3.13.1
 cryptography==44.0.0
 cupshelpers==1.0
