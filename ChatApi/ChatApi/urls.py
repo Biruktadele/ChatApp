@@ -11,8 +11,8 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('Chat.urls')),
-    path('', views.login_view, name='login'),
-    path('chat/<int:chatid>/', views.chat_view, name='chat'),
+    # path('', views.login_view, name='login'),
+    # path('chat/<int:chatid>/', views.chat_view, name='chat'),
 ]
-if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+# if settings.DEBUG:
+#     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

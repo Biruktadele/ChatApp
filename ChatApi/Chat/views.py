@@ -45,56 +45,56 @@ class MessageViewSet(viewsets.ModelViewSet):
 from django.shortcuts import render, redirect
 # from .models import Room, Message
 
-def login_view(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        chat_id = request.POST.get('chat_id') # Removed .lower()
+# def login_view(request):
+#     if request.method == 'POST':
+#         username = request.POST.get('username')
+#         chat_id = request.POST.get('chat_id') # Removed .lower()
 
-        if username and chat_id:
-            request.session['username'] = username
-            request.session['chat_id'] = chat_id
+#         if username and chat_id:
+#             request.session['username'] = username
+#             request.session['chat_id'] = chat_id
 
-            # Create chat if it doesn't exist
-            Chat.objects.get_or_create(id=chat_id)
+#             # Create chat if it doesn't exist
+#             Chat.objects.get_or_create(id=chat_id)
 
-            return redirect('chat', chatid=chat_id) # Ensure your URL name is 'chat' and it takes 'chatid'
+#             return redirect('chat', chatid=chat_id) # Ensure your URL name is 'chat' and it takes 'chatid'
 
-    return render(request, 'login.html')
+#     return render(request, 'login.html')
 
 
-def chat_view(request, chatid):
-    username = request.session.get('username')
-    if not username:
-        return redirect('login')
+# def chat_view(request, chatid):
+#     username = request.session.get('username')
+#     if not username:
+#         return redirect('login')
     
-    messages = []
-    try:
-        # Use Chat model, not Room
-        chat_instance = Chat.objects.get(id=chatid)
-        # Order by 'created_at', not 'timestamp'
-        messages = Message.objects.filter(chat_id=chat_instance).order_by('-created_at')[:50]
-    except Chat.DoesNotExist: # Catch Chat.DoesNotExist
-        # You might want to handle this case, e.g., show an error
-        pass
+#     messages = []
+#     try:
+#         # Use Chat model, not Room
+#         chat_instance = Chat.objects.get(id=chatid)
+#         # Order by 'created_at', not 'timestamp'
+#         messages = Message.objects.filter(chat_id=chat_instance).order_by('-created_at')[:50]
+#     except Chat.DoesNotExist: # Catch Chat.DoesNotExist
+#         # You might want to handle this case, e.g., show an error
+#         pass
     
-    # Format messages for template
-    formatted_messages = []
-    for message in messages:
-        # Check if sender exists to determine if it's a system message
-        is_system_msg = message.sender_id is None
+#     # Format messages for template
+#     formatted_messages = []
+#     for message in messages:
+#         # Check if sender exists to determine if it's a system message
+#         is_system_msg = message.sender_id is None
         
-        formatted_messages.append({
-            # Use sender's username if it exists, otherwise 'System'
-            'username': 'System' if is_system_msg else message.sender_id.username,
-            'content': message.content,
-            'timestamp': message.created_at,
-            'is_system': is_system_msg,
-            'is_current_user': False if is_system_msg else message.sender_id.username == username,
-        })
+#         formatted_messages.append({
+#             # Use sender's username if it exists, otherwise 'System'
+#             'username': 'System' if is_system_msg else message.sender_id.username,
+#             'content': message.content,
+#             'timestamp': message.created_at,
+#             'is_system': is_system_msg,
+#             'is_current_user': False if is_system_msg else message.sender_id.username == username,
+#         })
     
-    context = {
-        'chat_id': chatid,
-        'username': username,
-        'messages': list(reversed(formatted_messages))  # Show oldest first
-    }
-    return render(request, 'chat.html', context)
+#     context = {
+#         'chat_id': chatid,
+#         'username': username,
+#         'messages': list(reversed(formatted_messages))  # Show oldest first
+#     }
+#     return render(request, 'chat.html', context)
