@@ -24,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-o%x+bw82d&fso2bs#8%#$37u78uq$q5$tn7u*04x1njt@v%shv')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1' , 'localhost']
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'rest_framework',
     'rest_framework_nested',
+    'rest_framework_simplejwt',
     
     'cloudinary',
     'cloudinary_storage',
@@ -80,6 +81,9 @@ cloudinary.config(
     api_secret=os.environ.get('CLOUDINARY_API_SECRET'),
 )
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
@@ -91,6 +95,11 @@ REST_FRAMEWORK = {
     ],
 }
 
+from datetime import timedelta 
+SIMPLE_JWT = {     
+'ACCESS_TOKEN_LIFETIME': timedelta(days=100), 
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=100),
+}
 
 # DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
@@ -132,12 +141,12 @@ ASGI_APPLICATION = 'ChatApi.asgi.application' # Add this for ASGI server
 
 DATABASES = {
     'default': dj_database_url.config(
-        # Feel free to alter this value to suit your needs.
-        default='sqlite:///db.sqlite3',
+        # When deployed on Render, this will use the DATABASE_URL environment variable.
+        # When run locally, it will fall back to the default PostgreSQL connection string.
+        default='postgres://postgres:1234@localhost:5432/chatapp',
         conn_max_age=600
     )
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
