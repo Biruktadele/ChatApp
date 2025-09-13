@@ -28,6 +28,7 @@ django-cloudinary-storage
 
 # Authentication
 django-allauth
+dj-rest-auth
 google-auth-oauthlib
 
 # Other utilities
