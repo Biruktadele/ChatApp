@@ -141,10 +141,11 @@ ASGI_APPLICATION = 'ChatApi.asgi.application' # Add this for ASGI server
 
 DATABASES = {
     'default': dj_database_url.config(
-        # When deployed on Render, this will use the DATABASE_URL environment variable.
-        # When run locally, it will fall back to the default PostgreSQL connection string.
-        default='postgres://postgres:1234@localhost:5432/chatapp',
-        conn_max_age=600
+        # On Render, this reads DATABASE_URL. Locally, it falls back to SQLite.
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+        # Require SSL in production (helps avoid 'sslmode' issues on managed Postgres)
+        ssl_require=not DEBUG,
     )
 }
 
