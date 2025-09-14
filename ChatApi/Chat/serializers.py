@@ -1,12 +1,13 @@
 from rest_framework import serializers
 from .models import Chat, Message
 from typing import Optional
-
+from  core.serializers import UserSerializer
 class ChatSerializer(serializers.ModelSerializer):
     last_message = serializers.SerializerMethodField()
     unread_count = serializers.SerializerMethodField()
     last_message_time = serializers.SerializerMethodField()
-    
+    user1 = UserSerializer(read_only=True, source='user1_id')
+    user2 = UserSerializer(read_only=True, source='user2_id')
     def get_last_message(self, obj):
         last_msg = obj.messages.last()
         return last_msg.content if last_msg else None
@@ -21,7 +22,7 @@ class ChatSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Chat
-        fields = ['id', 'user1_id', 'user2_id', 'last_message', 'unread_count', 'last_message_time']
+        fields = ['id', 'user1', 'user2', 'last_message', 'unread_count', 'last_message_time']
     
    
 class intiatChatSerializer(serializers.ModelSerializer):
@@ -44,9 +45,11 @@ class intiatChatSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
+    sender = UserSerializer(read_only=True, source='sender_id')
+    chat = ChatSerializer(read_only=True, source='chat_id')
     class Meta:
         model = Message
-        fields = '__all__'
+        fields = ['id', 'chat', 'sender', 'content', 'is_read', 'created_at']
 
 
 class sendMessageSerializer(serializers.ModelSerializer):
