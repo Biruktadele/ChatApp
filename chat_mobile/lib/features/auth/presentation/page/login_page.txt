@@ -1,0 +1,150 @@
+import 'package:flutter/material.dart';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../bloc/auth_bloc.dart';
+import '../widget/Text.dart';
+import '../widget/account_nav.dart';
+import '../widget/button_widget.dart';
+import '../widget/ecom.widget.dart';
+import '../widget/input_filed.dart';
+import 'sign_up.dart';
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  void _clearControllers() {
+    // nameController.clear();
+    emailController.clear();
+    passwordController.clear();
+  }
+
+  void _onLoginPressed() {
+    final email = emailController.text.trim();
+    final password = passwordController.text;
+    // Don't clear here; only clear on success so users don't lose input on failure
+    context.read<AuthBloc>().add(LoginUser(email, password));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      // body: SingleChildScrollView(
+      body: SingleChildScrollView(
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          child: Stack(
+            children: [
+              const Positioned(
+                top: 122,
+                left: 124,
+                child: EcomWidget(hight: 70, width: 144, size: 48),
+              ),
+              const Positioned(
+                top: 252,
+                left: 30,
+                child: TextWidget(text: 'Sign into your account'),
+              ),
+              Positioned(
+                top: 316,
+                left: 30,
+                child: InputFiled(
+                  label: 'Email',
+                  hint: 'ex: jon.smith@email.com',
+                  controller: emailController,
+                ),
+              ),
+              Positioned(
+                top: 426,
+                left: 30,
+                child: InputFiled(
+                  label: 'Password',
+                  hint: '*********',
+                  controller: passwordController,
+                ),
+              ),
+              Positioned(
+                top: 546,
+                left: 30,
+                child: ButtonWidget(
+                  text: 'Sign In',
+                  onPressed: _onLoginPressed,
+                ),
+              ),
+              const Positioned(
+                top: 696,
+                left: 30,
+                child: AccountNav(
+                  nav: 'Sign Up',
+                  text: 'Don\'t have an account?',
+                  page: SignUpPage(),
+                ),
+              ),
+              // BlocConsumer handles side-effects (snackbars/navigation)
+              // and renders a lightweight loading overlay when needed.
+              BlocConsumer<AuthBloc, AuthState>(
+                listener: (context, state) {
+                  if (state is AuthFailure) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Wrong password or email'),
+                        backgroundColor: Colors.red,
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  }
+                  if (state is AuthSuccess) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Login Successful!'),
+                        backgroundColor: Colors.green,
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                    // Clear input fields only after a successful login
+                    _clearControllers();
+                    // Navigate after success
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const Text('Logged In Successfully!'),
+                      ),
+                    );
+                  }
+                },
+                builder: (context, state) {
+                  if (state is AuthLoading) {
+                    return const Positioned.fill(
+                      child: ColoredBox(
+                        color: Color(0x66000000),
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                    );
+                  }
+                  // Render nothing by default so it doesn't block the UI in the Stack
+                  return const SizedBox.shrink();
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
