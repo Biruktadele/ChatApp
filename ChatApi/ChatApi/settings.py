@@ -21,8 +21,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-o%x+bw82d&fso2bs#8%#$37u78uq$q5$tn7u*04x1njt@v%shv')
+# SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-o%x+bw82d&fso2bs#8%#$37u78uq$q5$tn7u*04x1njt@v%shv')
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
+# Database from environment
+DATABASES = {
+    'default': dj_database_url.config(
+        default=os.environ.get("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True,
+    )
+}
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
@@ -103,7 +112,12 @@ SIMPLE_JWT = {
 
 # DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
+DJOSER = {
+    'SERIALIZERS': {
+        'current_user': 'core.serializers.UserSerializer',
 
+    }
+}
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -139,13 +153,23 @@ ASGI_APPLICATION = 'ChatApi.asgi.application' # Add this for ASGI server
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         # On Render, this reads DATABASE_URL. Locally, it falls back to SQLite.
+#         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+#         conn_max_age=600,
+#         # Require SSL in production (helps avoid 'sslmode' issues on managed Postgres)
+#         ssl_require=not DEBUG,
+#     )
+# }
+# SECRET_KEY = os.environ.get("SECRET_KEY")
+
+# Database from environment
 DATABASES = {
     'default': dj_database_url.config(
-        # On Render, this reads DATABASE_URL. Locally, it falls back to SQLite.
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        default=os.environ.get("DATABASE_URL"),
         conn_max_age=600,
-        # Require SSL in production (helps avoid 'sslmode' issues on managed Postgres)
-        ssl_require=not DEBUG,
+        ssl_require=True,
     )
 }
 
