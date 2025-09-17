@@ -26,10 +26,13 @@ class ChatSerializer(serializers.ModelSerializer):
     
    
 class intiatChatSerializer(serializers.ModelSerializer):
+    
+    user1 = UserSerializer(read_only=True, source='user1_id')
+    user2 = UserSerializer(read_only=True, source='user2_id')
     class Meta:
         model = Chat
-        fields = ['id' , 'user1_id' , 'user2_id']
-        read_only_fields = ['id' , 'user1_id']
+        fields = ['id' , 'user1' , 'user2' , 'user2_id']
+        read_only_fields = ['id' , 'user1']
     def create(self, validated_data):
         last_chat = ""
         user1_id = self.context['request'].user

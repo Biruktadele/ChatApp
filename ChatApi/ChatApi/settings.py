@@ -147,25 +147,26 @@ ASGI_APPLICATION = 'ChatApi.asgi.application' # Add this for ASGI server
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': dj_database_url.config(
-#         # On Render, this reads DATABASE_URL. Locally, it falls back to SQLite.
-#         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-#         conn_max_age=600,
-#         # Require SSL in production (helps avoid 'sslmode' issues on managed Postgres)
-#         ssl_require=not DEBUG,
-#     )
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',  # Use the PostgreSQL backend
+        'NAME': 'chatapp',  # Database name
+        'USER': 'postgres',  # Default PostgreSQL username
+        'PASSWORD': '1234',  # Default PostgreSQL password
+        'HOST': 'localhost',  # Host where PostgreSQL is running
+        'PORT': '5432',  # Default PostgreSQL port
+    }
+}
 # SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # Database from environment
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get("DATABASE_URL"),
-        conn_max_age=600,
-        ssl_require=True,
-    )
-}
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         default=os.environ.get("DATABASE_URL"),
+#         conn_max_age=600,
+#         ssl_require=True,
+#     )
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
