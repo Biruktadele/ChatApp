@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class ChatInputBar extends StatelessWidget {
-  const ChatInputBar({super.key});
+import '../../bloc/bloc/chat_bloc.dart';
 
+class ChatInputBar extends StatefulWidget {
+  final int chatId;
+  const ChatInputBar({super.key, required this.chatId });
+
+  @override
+  State<ChatInputBar> createState() => _ChatInputBarState();
+}
+
+class _ChatInputBarState extends State<ChatInputBar> {
+  
+  final TextEditingController _controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -14,6 +25,7 @@ class ChatInputBar extends StatelessWidget {
           children: [
             Expanded(
               child: TextField(
+                controller: _controller,
                 maxLines: 5,
                 minLines: 1,
                 decoration: InputDecoration(
@@ -26,7 +38,16 @@ class ChatInputBar extends StatelessWidget {
                   ),
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.send, color: Colors.blue),
-                    onPressed: () {},
+                    onPressed: () {
+                      
+                      final text = _controller.text.trim();
+                      if (text.isNotEmpty) {
+                        context.read<ChatBloc>().add(
+                          SendMessageEvent(widget.chatId, text),
+                        );
+                        _controller.clear(); // Clear input after sending
+                      }
+                    },
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -44,7 +65,10 @@ class ChatInputBar extends StatelessWidget {
                   shape: const CircleBorder(),
                   child: IconButton(
                     icon: const Icon(Icons.camera_alt, color: Colors.white),
-                    onPressed: () {},
+                    onPressed: () {
+                      
+
+                    },
                   ),
                 ),
                 const SizedBox(height: 8),

@@ -17,6 +17,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LogoutUser>(_onLogoutUser);
     on<LoginUser>(_onLoginUser);
     on<RegisterUser>(_onRegisterUser);
+    on<GetAllUsers>(_onGetAllUsers);
   }
 
 
@@ -60,6 +61,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     result.fold(
       (failure) => emit(LogoutFailure(failure)),
       (_) => emit(const LogoutSuccess()),
+    );
+  }
+
+  Future<void> _onGetAllUsers(GetAllUsers event, Emitter<AuthState> emit) async {
+    emit(const GetAllUsersLoading());
+
+    final result = await userRepository.getAllUsers();
+
+    result.fold(
+      (failure) => emit(GetAllUsersFailure(failure)),
+      (users) => emit(GetAllUsersSuccess(users)),
     );
   }
 }

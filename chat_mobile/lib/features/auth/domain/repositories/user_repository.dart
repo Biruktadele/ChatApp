@@ -8,4 +8,6 @@ abstract class UserRepository {
   Future<Either<Failure, User>> registerUser(User user);
   Future<Either<Failure, User>> loginUser(User user);
   Future<Either<Failure, String>> getToken();
+  // Future<Either<Failure, User>> getUser();
+  Future<Either<Failure, List<User>>> getAllUsers();
 }

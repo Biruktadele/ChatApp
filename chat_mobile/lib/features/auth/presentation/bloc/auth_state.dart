@@ -56,15 +56,38 @@ final class RegisterFailure extends AuthState {
 
 //// Logout ////
 final class LogoutLoading extends AuthState {
-  const LogoutLoading(); 
+  const LogoutLoading();
 }
+
 final class LogoutSuccess extends AuthState {
   const LogoutSuccess();
 }
+
 final class LogoutFailure extends AuthState {
   final Failure failure;
   const LogoutFailure(this.failure);
 
   @override
   List<Object?> get props => [failure];
+}
+
+//// Get All Users ////
+final class GetAllUsersLoading extends AuthState {
+  const GetAllUsersLoading();
+}
+
+final class GetAllUsersSuccess extends AuthState {
+  final List<User> users;
+  const GetAllUsersSuccess(this.users);
+
+  @override
+  List<Object?> get props => [users];
+}
+
+final class GetAllUsersFailure extends AuthState {
+  final Failure failure;
+  const GetAllUsersFailure(this.failure);
+
+  @override
+  List<Object?> get props => [failure]; 
 }

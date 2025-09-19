@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:chat_mobile/core/navigation/blur_page_route.dart';
 
+import '../../../../main.dart';
+import '../../../chat/presentation/screens/Home_page.dart';
 import '../widget/login/login_button.dart';
 import '../widget/login/login_title.dart';
 import '../widget/login/password_input.dart';
@@ -58,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
             debugPrint('Login successful');
             Navigator.of(
               context,
-            ).push(BlurPageRoute(builder: (_) => const DemoPage()));
+            ).push(BlurPageRoute(builder: (_) => const MyApp()));
           }
           if (state is loginFailure) {
             final msg = state.failure.message.isNotEmpty

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:chat_mobile/core/constant/color_const.dart';
 
 class ProfileShow extends StatefulWidget {
-  const ProfileShow({super.key});
+  final String username;
+  const ProfileShow({super.key, required this.username});
 
   @override
   State<ProfileShow> createState() => _ProfileShowState();
@@ -29,7 +30,7 @@ class _ProfileShowState extends State<ProfileShow> {
           ),
           const SizedBox(width: 16),
           Text(
-            'Martina Wolna',
+            widget.username,
             style: TextStyle(color: white,
              fontSize: 27 , 
            

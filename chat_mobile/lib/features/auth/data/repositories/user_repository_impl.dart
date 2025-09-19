@@ -65,7 +65,7 @@ class UserRepositoryImpl implements UserRepository {
        return Left(Failure(e.toString()));
      }
    } else {
-     print('user is offline');
+    //  print('user is offline');
      return Left(Failure('user is offline'));
    }
  }
@@ -86,4 +86,19 @@ class UserRepositoryImpl implements UserRepository {
      return Left(Failure('user is offline'));
    }
  }
+ 
+ @override
+ Future<Either<Failure, List<User>>> getAllUsers() async {
+   if (await networkInfo.isConnected) {
+     try {
+       final remoteUsers = await remoteDataSource.getAllUsers();
+       return Right(remoteUsers);
+     } catch (e) {
+       return Left(Failure(e.toString()));
+     }
+   } else {
+     return Left(Failure('user is offline'));
+   }
+ }
+
 }

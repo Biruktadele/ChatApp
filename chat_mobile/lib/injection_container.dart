@@ -1,3 +1,5 @@
+//
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 
@@ -11,30 +13,60 @@ import 'features/auth/data/datasources/remote_data/user_remote_data_source.dart'
 import 'features/auth/data/datasources/remote_data/user_remote_data_source_impl.dart';
 import 'features/auth/data/repositories/user_repository_impl.dart';
 import 'features/auth/domain/repositories/user_repository.dart';
+import 'features/auth/domain/usecases/get_all_user.dart';
 import 'features/auth/domain/usecases/login_user.dart';
 import 'features/auth/domain/usecases/logout_user.dart';
 import 'features/auth/domain/usecases/register_user.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/chat/data/datasources/remotdata/remot_data_source.dart';
+import 'features/chat/data/datasources/remotdata/remot_data_source_impl.dart';
+import 'features/chat/data/datasources/socketio/chat_socket_service.dart';
+import 'features/chat/data/datasources/socketio/socket_io_chat_socket_service.dart';
+import 'features/chat/data/repositories/chat_repositorie_impl.dart';
+import 'features/chat/data/repositories/chat_socket_repository_impl.dart';
+import 'features/chat/domain/repositories/chat_reositorie.dart';
+import 'features/chat/domain/repositories/chat_socket_repository.dart';
+import 'features/chat/domain/usecases/creat_chat_usecase.dart';
+import 'features/chat/domain/usecases/delet_message_usecase.dart';
+import 'features/chat/domain/usecases/delete_chat_usecase.dart';
+import 'features/chat/domain/usecases/get_chat_usecase.dart';
+import 'features/chat/domain/usecases/get_message_usecase.dart';
+import 'features/chat/domain/usecases/socket/connect_socket.dart';
+import 'features/chat/domain/usecases/socket/join_chat_room.dart';
+import 'features/chat/domain/usecases/socket/on_message_stream.dart';
+import 'features/chat/domain/usecases/socket/send_realtime_message.dart';
+import 'features/chat/presentation/bloc/bloc/chat_bloc.dart';
+// chat socket
+// ...existing code...
 
 //chat
-
 
 final sl = GetIt.instance;
 
 Future<void> init() async {
-
   //! Features - Product Catalog
-  sl.registerFactory(() => AuthBloc(sl()));
-  //chat
-  // usecase
 
-  //auth
+  initAuth();
+  initChat();
+  initChatSocket();
+  //! Core
+  sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
+
+  ///auth + chat
+  sl.registerLazySingleton(() => const FlutterSecureStorage());
+  sl.registerLazySingleton(() => http.Client());
+  sl.registerLazySingleton<InternetConnectionChecker>(
+    () => InternetConnectionChecker.createInstance(),
+  );
+}
+
+void initAuth() {
+  sl.registerFactory(() => AuthBloc(sl()));
   sl.registerLazySingleton(() => LoginUserUsecase(sl()));
   sl.registerLazySingleton(() => RegisterUserUsecase(sl()));
   sl.registerLazySingleton(() => LogoutUserUsecase(sl()));
-  //chat
+  sl.registerLazySingleton(() => GetAllUsersUsecase(sl()));
 
-  // Repository
   sl.registerLazySingleton<UserRepository>(
     () => UserRepositoryImpl(
       remoteDataSource: sl(),
@@ -42,8 +74,7 @@ Future<void> init() async {
       networkInfo: sl(),
     ),
   );
-  //chat
-
+  // ...existing code...
 
   // Data Source
   //auth
@@ -53,17 +84,50 @@ Future<void> init() async {
   sl.registerLazySingleton<UserRemoteDataSource>(
     () => UserRemoteDataSourceImpl(client: sl(), secureStorage: sl()),
   );
-  //chat
- 
+}
 
-  //! Core
-  sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
+void initChat() {
+  // Register other dependencies here if needed
 
-  //! External
-  ///auth + chat
-  sl.registerLazySingleton(() => const FlutterSecureStorage());
-  sl.registerLazySingleton(() => http.Client());
-  sl.registerLazySingleton<InternetConnectionChecker>(
-    () => InternetConnectionChecker.createInstance(),
+  sl.registerFactory(() => ChatBloc(sl() , sl()));
+  // Use cases
+  sl.registerLazySingleton(() => GetChatsUsecase(sl()));
+  sl.registerLazySingleton(() => CreateChatUsecase(sl()));
+  sl.registerLazySingleton(() => DeleteChatUsecase(sl()));
+  sl.registerLazySingleton(() => GetMessagesUsecase(sl()));
+  sl.registerLazySingleton(() => DeleteMessageUsecase(sl()));
+  
+
+  // Repository
+  sl.registerLazySingleton<ChatRepository>(
+    () => ChatRepositorieImpl(remoteDataSource: sl(), networkInfo: sl()),
+  );
+  // Data Source
+  sl.registerLazySingleton<RemoteDataSource>(
+    () => RemotDataSourceImpl(client: sl(), secureStorage: sl()),
+  );
+}
+void initChatSocket() {
+  // Register other dependencies here if needed
+
+  // sl.registerFactory(() => ChatBloc(sl(), sl()));
+  // Use cases
+  sl.registerLazySingleton(() => ConnectSocket(sl() , sl()));
+  sl.registerLazySingleton(() => JoinChatRoom(sl()));
+  sl.registerLazySingleton(() => OnMessageStream(sl()));
+  sl.registerLazySingleton(() => SendRealtimeMessage(sl()));
+  // Repository
+  sl.registerLazySingleton<ChatSocketRepository>(
+    () => ChatSocketRepositoryImpl(
+      socketService: sl(),
+      userLocal: sl(),
+    ),
+  );
+  // sl.registerLazySingleton<ChatRepository>(
+  //   () => ChatRepositorieImpl(remoteDataSource: sl(), networkInfo: sl()),
+  // );
+  // Data Source
+  sl.registerLazySingleton<ChatSocketService>(
+    () => SocketIoChatSocketService(),
   );
 }

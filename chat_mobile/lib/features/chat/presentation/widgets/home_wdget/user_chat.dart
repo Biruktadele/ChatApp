@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../../../domain/entities/chat.dart';
+
 class UserChat extends StatefulWidget {
-  const UserChat({super.key});
+  final Chat? chat;
+  final String? username;
+  const UserChat({super.key , this.chat , this.username});
 
   @override
   State<UserChat> createState() => _UserChatState();
@@ -10,6 +14,10 @@ class UserChat extends StatefulWidget {
 class _UserChatState extends State<UserChat> {
   @override
   Widget build(BuildContext context) {
+    final String name = (widget.username == widget.chat?.user1?.username
+            ? widget.chat?.user2?.username
+            : widget.chat?.user1?.username) ??
+        'Unknown';
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 16.0),
       child: Row(
@@ -17,30 +25,32 @@ class _UserChatState extends State<UserChat> {
           Stack(
             clipBehavior: Clip.none,
             children: [
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 30,
                 backgroundImage: AssetImage(
-                  'assets/images/man2.jpeg',
+                  widget.chat?.avatar ?? 'assets/images/man2.jpeg'),
                 ), // Example image
-              ),
+          
               Positioned(
                 top: -5,
                 left: -5,
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Text(
-                    '2', // Example unread count
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+                child: (widget.chat?.unreadCount != null && widget.chat!.unreadCount! > 0)
+                    ? Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          widget.chat?.unreadCount?.toString() ?? '0',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
               ),
             ],
           ),
@@ -48,24 +58,24 @@ class _UserChatState extends State<UserChat> {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
-                  'John Doe', // Example name
+                  name == widget.username ? "Saved Messages" : name, // Example name
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 SizedBox(height: 4),
                 Text(
-                  'Hey, how are you?', // Example last message
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                    widget.chat?.lastMessage ?? 'No message', // Example last message
+                  style: const TextStyle(color: Colors.grey, fontSize: 14),
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
           const SizedBox(width: 16),
-          const Text(
-            '12:34 PM', // Example date
-            style: TextStyle(color: Colors.grey, fontSize: 12),
+          Text(
+            '${widget.chat?.lastMessageTime?.hour ?? '00'}:${widget.chat?.lastMessageTime?.minute ?? '00'}', // Example date
+            style: const TextStyle(color: Colors.grey, fontSize: 12),
           ),
         ],
       ),

@@ -40,3 +40,9 @@ final class LogoutUser extends AuthEvent {
   @override
   List<Object?> get props => [];
 }
+final class GetAllUsers extends AuthEvent {
+  const GetAllUsers();
+
+  @override
+  List<Object?> get props => [];
+}

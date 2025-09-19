@@ -1,19 +1,87 @@
+import 'dart:math';
+
 import 'package:chat_mobile/features/chat/presentation/widgets/home_wdget/faveriet_card.dart';
 import 'package:chat_mobile/features/chat/presentation/widgets/home_wdget/profile_show.dart';
 import 'package:chat_mobile/features/chat/presentation/widgets/home_wdget/serch_bar.dart';
 import 'package:chat_mobile/features/chat/presentation/widgets/home_wdget/user_chat.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../core/constant/api_constatn.dart';
+import '../../data/datasources/socketio/chat_socket_service.dart';
+import '../../data/datasources/socketio/socket_io_chat_socket_service.dart';
+import '../../domain/entities/chat.dart';
+import '../bloc/bloc/chat_bloc.dart';
+import '../widgets/home_wdget/List_user.dart';
+import 'chat_page.dart';
+// import 'package:flutter_bloc/flutter_bloc.dart';
+// import '../bloc/bloc/chat_bloc.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final String username;
+  final String token;
+  final int userId;
+  const HomePage({super.key, required this.username, required this.token,required this.userId});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  List<Chat> chats = [];
+  bool loading = true;
+  bool error = false;
+
+// late SocketIoChatSocketService _socketService;
+
+@override
+void initState() {
+  super.initState();
+  // _socketService = SocketIoChatSocketService();
+
+  context.read<ChatBloc>().add(
+    ConnectSocketIoEvent(token: widget.token, baseUrl: socketUrl),
+  );
+
+  context.read<ChatBloc>().add(const LoadChats());
+  context.read<ChatBloc>().stream.listen((state) {
+    if (state is SocketConnectingErrorState) {
+      debugPrint('Socket connection error: ${state.message}');
+    }
+    if (state is SocketConnectedState) {
+      debugPrint('Socket connected successfully.');
+    }
+    if (state is ChatLoaded) {
+      setState(() {
+        loading = false;
+        chats = state.chats;
+      });
+    } else if (state is ChatLoading) {
+      setState(() {
+        loading = true;
+      });
+    } else if (state is ChatError) {
+      setState(() {
+        loading = false;
+        error = true;
+      });
+    } else if (state is ChatCreated) {
+      debugPrint('New chat created with ID: ${state.chat.id}');
+      setState(() {
+        chats.add(state.chat);
+      });
+    } else if (state is SocketJoinedErrorState) {
+      debugPrint('\n\n Socket joing room error ${state.message}');
+    } else if (state is SocketJoinedRoomState) {
+      debugPrint('\n\n\n conecting succsesfuly\n\n\n');
+    }
+  });
+}
+
   @override
   Widget build(BuildContext context) {
+    // context.read<ChatBloc>().add(const LoadChats());
+
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
@@ -24,28 +92,41 @@ class _HomePageState extends State<HomePage> {
               maxHeight: 100.0,
               child: Container(
                 color: Theme.of(context).scaffoldBackgroundColor,
-            child: ProfileShow(),
-          ),)),
+                child: ProfileShow(username: widget.username),
+              ),
+            ),
+          ),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(left: 32, top: 16, bottom: 16),
-              child: Row(children: [
-                const SearchBarr(), 
-                Container(
-                margin: const EdgeInsets.only(left: 16),
-        
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: IconButton(
-                  icon: const Icon(Icons.add, color: Colors.white, size: 30),
-                  onPressed: () {
-                    // TODO: Implement search functionality
-                  },
-                ),
-                ),
-              ],
+              child: Row(
+                children: [
+                  const SearchBarr(),
+                  Container(
+                    margin: const EdgeInsets.only(left: 16),
+
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.add,
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ListUser(chats: chats),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -72,14 +153,34 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                return const UserChat();
-              },
-              childCount: 20, // Example item count
+          if (!loading && !error)
+            SliverList(
+              delegate: SliverChildBuilderDelegate((
+                BuildContext context,
+                int index,
+              ) {
+                final chat = chats[index];
+                return TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatPage(chat: chat , userId: widget.userId),
+                      ),
+                    );
+                  },
+                  child: UserChat(chat: chat, username: widget.username),
+                );
+              }, childCount: chats.length),
             ),
-          ),
+          if (loading)
+            const SliverFillRemaining(
+              child: Center(child: CircularProgressIndicator()),
+            ),
+          if (error)
+            const SliverFillRemaining(
+              child: Center(child: Text('Failed to load chats')),
+            ),
         ],
       ),
     );
