@@ -45,7 +45,7 @@ async def save_and_broadcast_message(chat_id, user_id, content):
             'id': msg.id,
             'chat_id': msg.chat_id.id,
             'sender': msg.sender_id,
-            'sender_username': msg.sender_id.username,
+            'username': msg.sender_id.username,
             'content': msg.content,
             'created_at': msg.created_at.isoformat(),
             'is_read': msg.is_read,
