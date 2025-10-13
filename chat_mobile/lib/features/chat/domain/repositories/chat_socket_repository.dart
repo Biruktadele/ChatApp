@@ -1,6 +1,10 @@
 import 'dart:async';
 
-import 'package:chat_mobile/features/chat/domain/entities/message.dart';
+import 'package:dartz/dartz.dart';
+
+import '../../../../core/error/failure.dart';
+import '../entities/message.dart';
+import '../entities/sugession.dart';
 
 abstract class ChatSocketRepository {
   Future<void> connect({required String baseUrl, String? token});
@@ -12,4 +16,15 @@ abstract class ChatSocketRepository {
 
   Stream<Message> get messages;
   Stream<bool> get connection;
+  Stream<bool> get typing;
+  Stream<int> get readReceipts;
+  Stream<Suggestions> get suggestions;
+  // Stream<bool> get stopType;
+
+
+  // Stream<bool> get online;
+  // Stream<bool> get offline;
+  Future<void> startTyping(int chatId, int userId);
+  Future<void> markMessageAsRead(int messageId, int chatId);
+  Future<void> stopTyping(int chatId, int userId);
 }

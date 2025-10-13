@@ -1,4 +1,4 @@
-import 'package:chat_mobile/features/chat/domain/repositories/chat_socket_repository.dart';
+import '../../repositories/chat_socket_repository.dart';
 
 class JoinChatRoom {
   final ChatSocketRepository repo;

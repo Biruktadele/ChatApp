@@ -1,19 +1,18 @@
 import 'dart:ui';
-import 'package:chat_mobile/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:chat_mobile/features/auth/presentation/page/demo.dart';
-import 'package:chat_mobile/features/auth/presentation/page/sign_up_page.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:chat_mobile/core/navigation/blur_page_route.dart';
 
+import '../../../../core/navigation/blur_page_route.dart';
 import '../../../../main.dart';
-import '../../../chat/presentation/screens/Home_page.dart';
+import '../bloc/auth_bloc.dart';
 import '../widget/login/login_button.dart';
 import '../widget/login/login_title.dart';
 import '../widget/login/password_input.dart';
 import '../widget/login/register_link.dart';
 import '../widget/login/remember_forgot_row.dart';
 import '../widget/login/username_input.dart';
+import 'sign_up_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -57,7 +56,7 @@ class _LoginPageState extends State<LoginPage> {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is LoginSuccess) {
-            debugPrint('Login successful');
+            debugPrint('✨✨Login successful');
             Navigator.of(
               context,
             ).push(BlurPageRoute(builder: (_) => const MyApp()));

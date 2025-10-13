@@ -1,19 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../../bloc/bloc/chat_bloc.dart';
 
 class ChatInputBar extends StatefulWidget {
   final int chatId;
-  const ChatInputBar({super.key, required this.chatId });
+  const ChatInputBar({super.key, required this.chatId});
 
   @override
   State<ChatInputBar> createState() => _ChatInputBarState();
 }
 
 class _ChatInputBarState extends State<ChatInputBar> {
-  
+
+  late FocusNode _inputFocusNode;
+  int userId = 0;
+void initState() {
+  super.initState();
+  _inputFocusNode = FocusNode();
+  _inputFocusNode.addListener(_onInputFocusChange);
+  const storage = FlutterSecureStorage();
+  storage.read(key: 'userId').then((value) {
+    setState(() {
+      userId = int.parse(value ?? '0');
+    });
+  });
+  // ...existing code...
+}
   final TextEditingController _controller = TextEditingController();
+
+  void _onInputFocusChange() {
+  if (_inputFocusNode.hasFocus) {
+    // Text box is focused (user tapped in)
+    debugPrint('✅✅Text input focused!');
+    // Emit start typing event here
+    context.read<ChatBloc>().add(StartTypingEvent(widget.chatId , userId));
+  } else {
+    // Text box is unfocused (user tapped out)
+    debugPrint('✅✅Text input unfocused!');
+    // Emit stop typing event here
+    context.read<ChatBloc>().add(StopTypingEvent(widget.chatId, userId));
+  }
+}
+@override
+void dispose() {
+  _inputFocusNode.removeListener(_onInputFocusChange);
+  _inputFocusNode.dispose();
+  super.dispose();
+}
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -25,6 +60,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
           children: [
             Expanded(
               child: TextField(
+                focusNode: _inputFocusNode,
                 controller: _controller,
                 maxLines: 5,
                 minLines: 1,
@@ -43,7 +79,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
                       final text = _controller.text.trim();
                       if (text.isNotEmpty) {
                         context.read<ChatBloc>().add(
-                          SendMessageEvent(widget.chatId, text),
+                          SendMessageEvent(text),
                         );
                         _controller.clear(); // Clear input after sending
                       }

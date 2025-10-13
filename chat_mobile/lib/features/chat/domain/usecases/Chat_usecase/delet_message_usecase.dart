@@ -1,7 +1,7 @@
-import 'package:chat_mobile/features/chat/domain/repositories/chat_reositorie.dart';
+import '../../repositories/chat_reositorie.dart';
 import 'package:dartz/dartz.dart';
 
-import '../../../../core/error/failure.dart';
+import '../../../../../core/error/failure.dart';
 
 class DeleteMessageUsecase {
   final ChatRepository repository;

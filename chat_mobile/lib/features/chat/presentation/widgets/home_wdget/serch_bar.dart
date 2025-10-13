@@ -1,4 +1,4 @@
-import 'package:chat_mobile/core/constant/color_const.dart';
+import '../../../../../core/constant/color_const.dart';
 import 'package:flutter/material.dart';
 
 class SearchBarr extends StatefulWidget {

@@ -6,7 +6,7 @@ class BlurPageRoute<T> extends PageRouteBuilder<T> {
   BlurPageRoute({
     required WidgetBuilder builder,
     Duration duration = const Duration(milliseconds: 400),
-    RouteSettings? settings,
+    super.settings,
   }) : super(
          pageBuilder: (context, animation, secondaryAnimation) =>
              builder(context),
@@ -14,7 +14,6 @@ class BlurPageRoute<T> extends PageRouteBuilder<T> {
          reverseTransitionDuration: const Duration(milliseconds: 300),
          opaque: false,
          barrierColor: Colors.transparent,
-         settings: settings,
          transitionsBuilder: (context, animation, secondaryAnimation, child) {
            final curved = CurvedAnimation(
              parent: animation,

@@ -1,5 +1,5 @@
-import 'package:chat_mobile/features/auth/data/datasources/local_data/user_local_data_source.dart';
-import 'package:chat_mobile/features/chat/domain/repositories/chat_socket_repository.dart';
+import '../../../../auth/data/datasources/local_data/user_local_data_source.dart';
+import '../../repositories/chat_socket_repository.dart';
 
 class ConnectSocket {
   final ChatSocketRepository repo;

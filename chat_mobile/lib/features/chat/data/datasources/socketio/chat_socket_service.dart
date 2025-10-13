@@ -1,6 +1,10 @@
 import 'dart:async';
 
-import 'package:chat_mobile/features/chat/data/models/message_model.dart';
+import 'package:dartz/dartz.dart';
+
+import '../../../../../core/error/failure.dart';
+import '../../../domain/entities/sugession.dart';
+import '../../models/message_model.dart';
 
 import '../../../domain/entities/message.dart';
 
@@ -21,5 +25,14 @@ abstract class ChatSocketService {
   });
 
   Stream<MessageModel> get messages;
+  Stream<bool> get typing;
+  // Stream<bool> get stopType;
   Stream<bool> get connection;
+  Stream<int> get readReceipts;
+  Stream<Suggestions> get suggestions;
+
+  Future<void> startTyping(int chatId, int userId);
+  Future<void> markMessageAsRead(int chatId , int messageId);
+  Future<void> stopTyping(int chatId, int userId);
+  
 }

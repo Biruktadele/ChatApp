@@ -41,7 +41,7 @@ class _SignUpPageState extends State<SignUpPage> {
     final p = _password.text;
 
     final emailRegex = RegExp(
-      r"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}",
+      r'^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}',
       caseSensitive: false,
     );
     setState(() {
@@ -53,8 +53,9 @@ class _SignUpPageState extends State<SignUpPage> {
           ? 'Password must be at least 6 chars'
           : null;
     });
-    if (_usernameError != null || _emailError != null || _passwordError != null)
+    if (_usernameError != null || _emailError != null || _passwordError != null) {
       return;
+    }
 
     context.read<AuthBloc>().add(RegisterUser(u, e, p));
   }

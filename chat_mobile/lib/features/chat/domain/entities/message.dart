@@ -10,8 +10,7 @@ class Message extends Equatable {
   final User? sender;
   final Chat? chat;
   final DateTime? createdAt;
-  final bool? isRead;
-  
+  bool? isRead;
   Message({
     this.id,
     this.content,

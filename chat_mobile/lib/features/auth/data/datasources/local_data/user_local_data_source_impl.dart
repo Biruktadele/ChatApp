@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../../../../../core/db_manager/database_helper.dart';
 import '../../../domain/entities/user.dart';
 import '../../models/user_model.dart';
 import 'user_local_data_source.dart';
@@ -11,6 +13,8 @@ const tokenKey = 'token';
 
 class UserLocalDataSourceImpl implements UserLocalDataSource {
   final FlutterSecureStorage flutterSecureStorage;
+  final DatabaseHelper _databaseHelper = DatabaseHelper();
+
 
   UserLocalDataSourceImpl({required this.flutterSecureStorage});
 
@@ -56,4 +60,42 @@ class UserLocalDataSourceImpl implements UserLocalDataSource {
   Future<void> deleteToken() async {
     await flutterSecureStorage.delete(key: tokenKey);
   }
+
+
+  //User methods
+  @override
+  Future<void> cacheUsers(List<UserModel> users)async{
+    debugPrint('✨✨✨Caching ${users} users locally.');
+    await _databaseHelper.BulkInsert(
+        users.map((user) => UserModel.fromEntity(user).toMap()).toList(), 'User');
+  }
+  @override
+  Future<List<UserModel>> getCachedUsers() async {
+
+   return await _databaseHelper.getall('User')
+        .then((maps) => maps.map((map) => UserModel.fromJson(map)).toList());
+  }
+  @override
+  Future<UserModel?> getUserById(int id) async {
+
+    return await _databaseHelper.getById('User', id)
+        .then((map) => map != null ? UserModel.fromJson(map) : null);
+  }
+  @override
+  Future<void> updateUser(User user) async {
+
+    await _databaseHelper.update(UserModel.fromEntity(user).toMap(), 'User');
+  }
+  @override
+  Future<void> removeUser(int user_id) async {
+
+    await _databaseHelper.delete('User', user_id);
+  }
+  @override
+  Future<void> clearUsersCache() async {
+
+    await _databaseHelper.clearTable('User');
+  }
+
+
 }

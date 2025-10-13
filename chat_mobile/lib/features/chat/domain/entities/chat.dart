@@ -6,9 +6,9 @@ class Chat extends Equatable {
   final int? id;
   final User? user1;
   final User? user2;
-  final String? lastMessage;
-  final int? unreadCount;
-  final DateTime? lastMessageTime;
+  String? lastMessage;
+  int? unreadCount;
+  DateTime? lastMessageTime;
   final String? avatar;
 
   Chat({

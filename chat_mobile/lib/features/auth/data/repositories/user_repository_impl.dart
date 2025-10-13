@@ -89,9 +89,23 @@ class UserRepositoryImpl implements UserRepository {
  
  @override
  Future<Either<Failure, List<User>>> getAllUsers() async {
+
+  try {
+     final localUsers = await localDataSource.getCachedUsers();
+     if (localUsers.isNotEmpty) {
+       debugPrint('Retrieved ${localUsers.length} users from cache.');
+       final users = localUsers.map((userModel) => userModel.toEntity()).toList();
+       return Right(users);
+     }
+   } catch (e) {
+     // Handle cache retrieval error if necessary
+     debugPrint('Error retrieving cached users: $e');
+   }
    if (await networkInfo.isConnected) {
      try {
        final remoteUsers = await remoteDataSource.getAllUsers();
+       final userModels = remoteUsers.map((user) => UserModel.fromEntity(user)).toList();
+      await localDataSource.cacheUsers(userModels);
        return Right(remoteUsers);
      } catch (e) {
        return Left(Failure(e.toString()));

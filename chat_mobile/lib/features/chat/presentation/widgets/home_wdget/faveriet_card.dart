@@ -33,7 +33,7 @@ class _FaverietCardState extends State<FaverietCard> {
               ),
             ),
           ),
-          Positioned(
+          const Positioned(
             bottom: 20,
             right: 20,
             child: Icon(Icons.favorite, color: Colors.red, size: 14),

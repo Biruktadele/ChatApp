@@ -58,31 +58,43 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
 
   @override
   Future<User> loginUser(User user) async {
-    final dynamic m = UserModel.fromEntity(user).toLoginJson();
+    final url = Uri.parse('$baseUrl/token/');
+    final requestBody = jsonEncode(UserModel.fromEntity(user).toLoginJson());
 
-    debugPrint('Login request body: $m'); // Debug printr
-    final response = await client.post(
-      Uri.parse('$baseUrl/token/'),
-      headers: defaultHeaders,
-      body: jsonEncode(UserModel.fromEntity(user).toLoginJson()),
-    );
-    final decodedBody = jsonDecode(response.body);
-  
-    debugPrint('Login response body: $decodedBody'); // Debug print
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    debugPrint('🚀 Sending POST request to $url');
+    debugPrint('✨ Login request body: $requestBody');
 
-      final data = decodedBody['data'];
-      final token = decodedBody['access'];
-  
-      if (token == null) {
-        throw Exception('No token in login response');
+    try {
+      final response = await client.post(
+        url,
+        headers: defaultHeaders,
+        body: requestBody,
+      );
+
+      final decodedBody = jsonDecode(response.body);
+      debugPrint('✅ Received response: ${response.statusCode}');
+      debugPrint('✨ Login response body: $decodedBody');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final token = decodedBody['access'];
+
+        if (token == null) {
+          throw Exception('No token in login response');
+        }
+        await saveToken(token);
+        await saveUsername(user.username!);
+
+        // Assuming the response body itself contains the user data.
+        // If user data is nested, e.g., in decodedBody['user'], adjust this.
+        return UserModel.fromJson(decodedBody);
+      } else {
+        throw Exception('Failed to login: ${decodedBody['detail']}');
       }
-      await saveToken(token);
-      await saveUsername(user.username!);
-      await saveUserId(user.id!);
-      return UserModel.fromJson(decodedBody);
-    } else {
-      throw Exception('${decodedBody['detail']}');
+    } catch (e) {
+      debugPrint('❌ Exception caught in loginUser: $e');
+      // Rethrowing to be handled by the repository/UI layer.
+      // You could also return a custom error object here.
+      throw Exception('Failed to connect to the server: $e');
     }
   }
 
@@ -110,6 +122,7 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
   Future<void> deleteToken() async {
     await secureStorage.delete(key: _tokenKey);
   }
+
   @override
   Future<List<User>> getAllUsers() async {
     final token = await getToken();

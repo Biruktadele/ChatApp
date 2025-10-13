@@ -6,11 +6,13 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.name,
     required this.status,
     required this.avatarAsset,
+    required this.typing_status,
   });
 
   final String name;
   final String status;
   final String avatarAsset;
+  final bool typing_status; // Make this final
 
   @override
   Size get preferredSize => const Size.fromHeight(60);
@@ -63,15 +65,17 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
           ),
           const SizedBox(height: 3),
-          Text(
-            status,
-            style: TextStyle(
-              fontSize: 13,
-              color: status.toLowerCase() == 'online'
-                  ? Colors.green
-                  : Colors.grey,
-            ),
-          ),
+          typing_status
+              ? const _TypingIndicator()
+              : Text(
+                  status,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: status.toLowerCase() == 'online'
+                        ? Colors.green
+                        : Colors.grey,
+                  ),
+                ),
         ],
       ),
       actions: [
@@ -85,6 +89,53 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         const SizedBox(width: 8),
       ],
+    );
+  }
+}
+
+class _TypingIndicator extends StatefulWidget {
+  const _TypingIndicator({Key? key}) : super(key: key);
+
+  @override
+  State<_TypingIndicator> createState() => _TypingIndicatorState();
+}
+
+class _TypingIndicatorState extends State<_TypingIndicator>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<int> _dotsAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 900),
+      vsync: this,
+    )..repeat();
+    _dotsAnimation = StepTween(begin: 0, end: 3).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _dotsAnimation,
+      builder: (context, child) {
+        String dots = '.' * _dotsAnimation.value;
+        return Text(
+          'typing$dots',
+          style: const TextStyle(
+            fontSize: 13,
+            color: Colors.grey,
+            fontStyle: FontStyle.italic,
+          ),
+        );
+      },
     );
   }
 }

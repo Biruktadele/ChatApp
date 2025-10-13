@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:chat_mobile/core/constant/color_const.dart';
+import '../../../../../core/constant/color_const.dart';
 
 class ProfileShow extends StatefulWidget {
   final String username;
@@ -20,7 +20,7 @@ class _ProfileShowState extends State<ProfileShow> {
           CircleAvatar(
             radius: 25,
             backgroundColor: plusButton,
-            child: ClipOval(
+            child: const ClipOval(
               child: Image(
                 image: AssetImage('assets/images/man2.jpeg'),
                 fit: BoxFit.cover,

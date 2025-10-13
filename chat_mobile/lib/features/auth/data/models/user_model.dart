@@ -98,4 +98,39 @@ class UserModel extends User {
       'password': password,
     };
   }
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'username': username,
+      'email': email,
+      'password': password,
+      'avatar': avatar,
+      'first_name': firstName,
+      'last_name': lastName,
+      'last_login': lastlogin,
+      'date_joined': dateJoined,
+      'phone_number': phoneNumber,
+      'bio': bio,
+      'birthday': birthDate,
+      'gender': gender,
+    };
+  }
+  User toEntity() {
+    return User(
+      id: id,
+      username: username,
+      email: email,
+      password: password,
+      avatar: avatar,
+      firstName: firstName,
+      lastName: lastName,
+      lastlogin: lastlogin,
+      dateJoined: dateJoined,
+      phoneNumber: phoneNumber,
+      bio: bio,
+      birthDate: birthDate,
+      gender: gender,
+    );
+  }
+  
 }

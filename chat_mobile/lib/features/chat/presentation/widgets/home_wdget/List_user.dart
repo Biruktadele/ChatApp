@@ -16,6 +16,7 @@ class ListUser extends StatefulWidget {
 }
 
 class _ListUserState extends State<ListUser> {
+  @override
   void initState() {
     super.initState();
     context.read<AuthBloc>().add(const GetAllUsers());
@@ -88,7 +89,7 @@ class _ListUserState extends State<ListUser> {
                           child: CircleAvatar(
                             radius: 32,
 
-                            backgroundImage: user.avatar != ""
+                            backgroundImage: user.avatar != ''
                                 ? NetworkImage(user.avatar!)
                                 : const AssetImage('assets/images/man2.jpeg'),
                           ),
@@ -108,7 +109,7 @@ class _ListUserState extends State<ListUser> {
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                "Online",
+                                'Online',
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.grey[700],
