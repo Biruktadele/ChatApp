@@ -167,27 +167,27 @@ ASGI_APPLICATION = 'ChatApi.asgi.application' # Add this for ASGI server
 # SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # Database from environment
-# DATABASES = {
-#     'default': dj_database_url.config(
-#         default=os.environ.get("DATABASE_URL"),
-#         conn_max_age=600,
-#         ssl_require=True,
-#     )
-# }
-# Replace the DATABASES section of your settings.py with this
-tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': tmpPostgres.path.replace('/', ''),
-        'USER': tmpPostgres.username,
-        'PASSWORD': tmpPostgres.password,
-        'HOST': tmpPostgres.hostname,
-        'PORT': 5432,
-        'OPTIONS': dict(parse_qsl(tmpPostgres.query)),
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True,
+    )
 }
+# Replace the DATABASES section of your settings.py with this
+# tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': tmpPostgres.path.replace('/', ''),
+#         'USER': tmpPostgres.username,
+#         'PASSWORD': tmpPostgres.password,
+#         'HOST': tmpPostgres.hostname,
+#         'PORT': 5432,
+#         'OPTIONS': dict(parse_qsl(tmpPostgres.query)),
+#     }
+# }
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
