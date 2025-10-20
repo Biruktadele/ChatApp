@@ -15,7 +15,7 @@ import cloudinary
 from pathlib import Path
 from dotenv import load_dotenv
 from urllib.parse import urlparse, parse_qsl
-
+import urllib.parse as up
 
 load_dotenv()  
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -167,27 +167,30 @@ ASGI_APPLICATION = 'ChatApi.asgi.application' # Add this for ASGI server
 # SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # Database from environment
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get("DATABASE_URL"),
-        conn_max_age=600,
-        ssl_require=True,
-    )
-}
-# Replace the DATABASES section of your settings.py with this
-# tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
-
 # DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': tmpPostgres.path.replace('/', ''),
-#         'USER': tmpPostgres.username,
-#         'PASSWORD': tmpPostgres.password,
-#         'HOST': tmpPostgres.hostname,
-#         'PORT': 5432,
-#         'OPTIONS': dict(parse_qsl(tmpPostgres.query)),
-#     }
+#     'default': dj_database_url.config(
+#         default=os.environ.get("DATABASE_URL"),
+#         conn_max_age=600,
+#         ssl_require=True,
+#     )
 # }
+# Replace the DATABASES section of your settings.py with this
+tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
+
+up.uses_netloc.append("postgres")
+url = up.urlparse(os.environ["DATABASE_URL"])
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': url.path[1:],
+        'USER': url.username,
+        'PASSWORD': url.password,
+        'HOST': url.hostname,
+        'PORT': url.port,
+        'SSLMODE': 'require',
+    }
+}
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
