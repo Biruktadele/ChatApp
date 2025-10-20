@@ -13,6 +13,9 @@ import os
 import dj_database_url
 import cloudinary
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()  
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -55,6 +58,7 @@ INSTALLED_APPS = [
     
     'cloudinary',
     'cloudinary_storage',
+    
 
 
     'core',
@@ -83,6 +87,7 @@ cloudinary.config(
     api_key=os.environ.get('CLOUDINARY_API_KEY'),
     api_secret=os.environ.get('CLOUDINARY_API_SECRET'),
 )
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -101,7 +106,7 @@ REST_FRAMEWORK = {
 from datetime import timedelta 
 SIMPLE_JWT = {     
 'ACCESS_TOKEN_LIFETIME': timedelta(days=100), 
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=100),
+'REFRESH_TOKEN_LIFETIME': timedelta(days=200), 
 }
 
 # DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
@@ -152,7 +157,7 @@ ASGI_APPLICATION = 'ChatApi.asgi.application' # Add this for ASGI server
 #         'ENGINE': 'django.db.backends.postgresql',  # Use the PostgreSQL backend
 #         'NAME': 'chatapp',  # Database name
 #         'USER': 'postgres',  # Default PostgreSQL username
-#         'PASSWORD': '1234',  # Default PostgreSQL password
+#         'PASSWORD': 'postgres',  # Default PostgreSQL password
 #         'HOST': 'localhost',  # Host where PostgreSQL is running
 #         'PORT': '5432',  # Default PostgreSQL port
 #     }

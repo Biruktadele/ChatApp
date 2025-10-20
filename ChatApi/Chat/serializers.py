@@ -14,8 +14,8 @@ class ChatSerializer(serializers.ModelSerializer):
     
 
     def get_unread_count(self, obj) -> int:
-        return obj.messages.filter(is_read=False).count()
-    
+        user_id = self.context['request'].user.id
+        return obj.messages.filter(is_read=False).exclude(sender_id=user_id).count()
     def get_last_message_time(self, obj) -> Optional[str]:
         last_msg = obj.messages.last()
         return last_msg.created_at.strftime('%Y-%m-%d %H:%M') if last_msg else None

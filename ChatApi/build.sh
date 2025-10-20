@@ -10,3 +10,5 @@ python manage.py collectstatic --no-input
 
 # Apply database migrations
 python manage.py migrate
+
+uvicorn ChatApi.asgi:application --host 0.0.0.0 --port 8001 --reload
