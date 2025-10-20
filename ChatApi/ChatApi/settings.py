@@ -35,9 +35,9 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-o%x+bw82d&fso2bs#8%#$
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
 ALLOWED_HOSTS =['*']# ['127.0.0.1' , 'localhost']
-# RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-# if RENDER_EXTERNAL_HOSTNAME:
-#     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # Application definition
 
@@ -175,10 +175,10 @@ ASGI_APPLICATION = 'ChatApi.asgi.application' # Add this for ASGI server
 #     )
 # }
 # Replace the DATABASES section of your settings.py with this
-tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
+# tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
 
 up.uses_netloc.append("postgres")
-url = up.urlparse(os.environ["DATABASE_URL"])
+url = up.urlparse(os.environ("DATABASE_URL"))
 
 DATABASES = {
     'default': {
