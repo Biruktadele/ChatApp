@@ -9,29 +9,33 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-    @action(detail=False, methods=['get', 'put', 'patch', 'delete'])
-    def me(self, request):
-        user = User.objects.get(id=request.user.id)
+    @action(detail=False, methods=['get'], url_path='me')
+    def get_me(self, request):
+        user = request.user
+        serializer = self.get_serializer(user)
+        return Response(serializer.data)
 
-        if request.method == 'GET':
-            serializer = UserSerializer(user)
-            return Response(serializer.data)
+    @get_me.mapping.put
+    def update_me(self, request):
+        user = request.user
+        serializer = self.get_serializer(user, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
-        if request.method == 'PUT':
-            serializer = UserSerializer(user, data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data)
-        
-        if request.method == 'PATCH':
-            serializer = UserSerializer(user, data=request.data, partial=True)  # Add partial=True
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data)
+    @get_me.mapping.patch
+    def partial_update_me(self, request):
+        user = request.user
+        serializer = self.get_serializer(user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
-        if request.method == 'DELETE':
-            user.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+    @get_me.mapping.delete
+    def delete_me(self, request):
+        user = request.user
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 from rest_framework import generics
 from .serializers import RegisterSerializer
 # from django.contrib.auth.models import User
