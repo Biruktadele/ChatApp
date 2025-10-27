@@ -180,7 +180,7 @@ ASGI_APPLICATION = 'ChatApi.asgi.application' # Add this for ASGI server
 deploy = True
 if deploy:
     up.uses_netloc.append("postgres")
-    url = up.urlparse(os.environ("DATABASE_URL"))
+    url = up.urlparse(os.environ.get("DATABASE_URL", ""))
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
