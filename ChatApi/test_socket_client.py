@@ -10,6 +10,7 @@ class TestClient:
 
     def __init__(self, name: str, base_url: str):
         self.name = name
+        # self.base_url = "http://0.0.0.0:8001"
         self.base_url = base_url
         self.sio = socketio.Client()
 
@@ -233,7 +234,7 @@ def run_end_to_end(
 
 def parse_args():
     p = argparse.ArgumentParser(description="Socket.IO E2E test: join, typing, send, read")
-    p.add_argument('--base-url', default='https://chatapp-1-603s.onrender.com', help='Socket.IO server base URL')
+    p.add_argument('--base-url', default='https://chatapp-1-603s.onrender.com/', help='Socket.IO server base URL')
     p.add_argument('--chat-id', type=int, default=1, help='Existing Chat.id to join')
     p.add_argument('--user1-id', type=int, default=3, help='Existing User.id for sender')
     p.add_argument('--user2-id', type=int, default=4, help='Existing User.id for receiver')

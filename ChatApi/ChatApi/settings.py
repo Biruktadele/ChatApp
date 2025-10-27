@@ -177,20 +177,33 @@ ASGI_APPLICATION = 'ChatApi.asgi.application' # Add this for ASGI server
 # Replace the DATABASES section of your settings.py with this
 # tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
 
-up.uses_netloc.append("postgres")
-url = up.urlparse(os.environ("DATABASE_URL"))
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': url.path[1:],
-        'USER': url.username,
-        'PASSWORD': url.password,
-        'HOST': url.hostname,
-        'PORT': url.port,
-        'SSLMODE': 'require',
+deploy = True
+if deploy:
+    up.uses_netloc.append("postgres")
+    url = up.urlparse(os.environ("DATABASE_URL"))
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': url.path[1:],
+            'USER': url.username,
+            'PASSWORD': url.password,
+            'HOST': url.hostname,
+            'PORT': url.port,
+            'SSLMODE': 'require',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'chatapp',
+            'USER': 'postgres',
+            'PASSWORD': 'postgres',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 

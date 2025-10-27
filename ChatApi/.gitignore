@@ -28,7 +28,7 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# SQLite databases
+#
 *.sqlite3
 db.sqlite3
 
@@ -41,7 +41,7 @@ ENV/
 env.bak/
 venv.bak/
 
-# Large files and SDKs
+# Large files and directories
 google-cloud-sdk/
 google-cloud-sdk-*.tar.gz
 
