@@ -42,12 +42,12 @@ if RENDER_EXTERNAL_HOSTNAME:
 # Application definition
 
 INSTALLED_APPS = [
+    'whitenoise.runserver_nostatic',  # Add this for serving static files
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'whitenoise.runserver_nostatic',  # Add this for serving static files
     'django.contrib.staticfiles',
     
     'allauth',
@@ -61,7 +61,6 @@ INSTALLED_APPS = [
     'cloudinary',
     'cloudinary_storage',
     
-
 
     'core',
     'Chat',
