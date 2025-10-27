@@ -19,6 +19,12 @@ get_user = sync_to_async(User.objects.get, thread_sensitive=True)
 create_message = sync_to_async(Message.objects.create, thread_sensitive=True)
 # NEW: async wrapper for smart replies (if original is sync)
 async_generate_replies = sync_to_async(generate_smart_replies, thread_sensitive=True)
+# NEW: async wrapper for chat membership check
+is_chat_member = sync_to_async(
+    lambda chat, user: chat.user1_id == user or chat.user2_id == user,
+    thread_sensitive=True
+)
+
 
 @sio.event
 async def connect(sid, environ):
@@ -59,7 +65,8 @@ async def save_and_broadcast_message(chat_id, user_id, content , sid):
         }
         
         # Broadcast the message to the room (which is the chat_id)
-        await sio.emit('message', message_payload, room=str(chat.id))
+        await sio.emit('chat_message', message_payload, room=str(chat.id))
+        print(f"✅ [sid:{sid}] Broadcasted 'chat_message' to room {chat.id}")
         try:
             suggestions = await async_generate_replies(chat_id, user_id)
             await sio.emit(
@@ -69,7 +76,7 @@ async def save_and_broadcast_message(chat_id, user_id, content , sid):
                 # skip_sid=sid
             )
 
-            print('🏵️🛼🛼🛼🛼Sent suggestions_event: ' + suggestions+"")
+            print(f"✅ [sid:{sid}] Sent 'suggestions_event': {suggestions}")
         except Exception as e:
             print(f"❌❌❌Smart reply generation failed: {e}")
     except Chat.DoesNotExist:
@@ -80,14 +87,36 @@ async def save_and_broadcast_message(chat_id, user_id, content , sid):
         print(f"An unexpected error occurred while saving/broadcasting message: {e}")
 
 @sio.event
-async def join(sid, data):
+async def join_chat(sid, data):
+    """Handles a client joining a chat room."""
     user_id = data.get('user_id')
     chat_id = data.get('chat_id')
+    print(f"👉 [sid:{sid}] Received 'join_chat' request: user_id={user_id}, chat_id={chat_id}")
+
     if not user_id or not chat_id:
+        print(f"🛑 [sid:{sid}] 'join_chat' failed: Missing user_id or chat_id.")
         return False
-    connected_clients[sid] = {'user_id': user_id, 'chat_id': chat_id}
-    await sio.enter_room(sid, str(chat_id))
-    return True  # ADDED
+
+    try:
+        chat = await get_chat(id=chat_id)
+        user = await get_user(id=user_id)
+
+        # Validate that the user is a member of the chat
+        if not await is_chat_member(chat, user):
+            print(f"🛑 [sid:{sid}] 'join_chat' denied: User {user_id} is not a member of chat {chat_id}.")
+            return False
+
+        connected_clients[sid] = {'user_id': user_id, 'chat_id': chat_id}
+        await sio.enter_room(sid, str(chat_id))
+        print(f"✅ [sid:{sid}] User {user_id} successfully joined room for chat {chat_id}.")
+        return True
+    except (Chat.DoesNotExist, User.DoesNotExist):
+        print(f"🛑 [sid:{sid}] 'join_chat' failed: Chat {chat_id} or User {user_id} not found.")
+        return False
+    except Exception as e:
+        print(f"❌ [sid:{sid}] 'join_chat' unexpected error: {e}")
+        return False
+
 
 @sio.event
 async def send_message(sid, data):
@@ -107,6 +136,7 @@ async def send_message(sid, data):
         content=message,
         sid=sid
     )
+    print(f"✅ [sid:{sid}] 'send_message' processed successfully.")
     return True
 @sio.event
 async def mark_as_read(sid, data):
@@ -128,6 +158,7 @@ async def mark_as_read(sid, data):
 
         # Optionally, notify other clients in the room that the message has been read
         await sio.emit('message_read', {'message_id': message_id}, room=str(chat_id))
+        print(f"✅ [sid:{sid}] Marked message {message_id} as read in chat {chat_id}.")
         
         return True
     except Message.DoesNotExist:
@@ -146,12 +177,14 @@ async def start_typing(sid, data):
     chat_id = session_data['chat_id']
     user_id = session_data['user_id']
     
+    print(f"👉 [sid:{sid}] User {user_id} started typing in chat {chat_id}.")
     # Broadcast typing event to other users in the chat room
     await sio.emit('typing', {'user_id': user_id}, room=str(chat_id) , skip_sid=sid)
 
     # Wait briefly then auto-stop typing (reduced from 60s)
     await asyncio.sleep(2)
     await sio.emit('stop_typing', {'user_id': user_id}, room=str(chat_id), skip_sid=sid)
+    print(f"✅ [sid:{sid}] Auto-sent 'stop_typing' for user {user_id} in chat {chat_id}.")
 
     return True
 @sio.event
@@ -164,6 +197,7 @@ async def stop_typing(sid, data):
     chat_id = session_data['chat_id']
     user_id = session_data['user_id']
     
+    print(f"👉 [sid:{sid}] User {user_id} stopped typing in chat {chat_id}.")
     # Broadcast stop typing event to other users in the chat room
     await sio.emit('stop_typing', {'user_id': user_id}, room=str(chat_id) , skip_sid=sid)
     return True
