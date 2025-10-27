@@ -2,6 +2,9 @@
 # exit on error
 set -o errexit
 
+# Add the project root to the PYTHONPATH
+export PYTHONPATH=.
+
 # Install dependencies
 pip install -r requirements.txt
 
@@ -10,5 +13,3 @@ python manage.py collectstatic --no-input
 
 # Apply database migrations
 python manage.py migrate
-
-# uvicorn ChatApi.asgi:application --host 0.0.0.0 --port 8001 --reload
