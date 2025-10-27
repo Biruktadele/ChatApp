@@ -2,9 +2,6 @@
 # exit on error
 set -o errexit
 
-# Add the project root to the PYTHONPATH
-# export PYTHONPATH=.
-
 # Install dependencies
 pip install -r requirements.txt
 
