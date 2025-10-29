@@ -1,6 +1,8 @@
 
 
 
+import 'dart:typed_data';
+
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 
@@ -115,4 +117,43 @@ class UserRepositoryImpl implements UserRepository {
    }
  }
 
+  @override
+  Future<Either<Failure, User>> me() async {
+    if (await networkInfo.isConnected) {
+      try {
+        final remoteUser = await remoteDataSource.me();
+        return Right(remoteUser);
+      } catch (e) {
+        return Left(Failure(e.toString()));
+      }
+    } else {
+      return Left(Failure('user is offline'));
+    }
+  }
+  @override
+  Future<Either<Failure, User>> updateMe(String field, String value) async {
+    if (await networkInfo.isConnected) {
+      try {
+        final remoteUser = await remoteDataSource.updateMe(field, value);
+        return Right(remoteUser);
+      } catch (e) {
+        return Left(Failure(e.toString()));
+      }
+    } else {
+      return Left(Failure('user is offline'));
+    }
+  }
+  @override
+  Future<Either<Failure, User>> updatePhoto(Uint8List photoBytes) async {
+    if (await networkInfo.isConnected) {
+      try {
+        final remoteUser = await remoteDataSource.updatePhoto(photoBytes);
+        return Right(remoteUser);
+      } catch (e) {
+        return Left(Failure(e.toString()));
+      }
+    } else {
+      return Left(Failure('user is offline'));
+    }
+  }
 }

@@ -1,12 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:dartz/dartz.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-import '../../../../../core/constant/api_constatn.dart';
-import '../../../../../core/error/failure.dart';
+import '../../../../../core/constant/api_constant.dart';
 import '../../../domain/entities/message.dart';
 import '../../../domain/entities/sugession.dart';
 import '../../models/message_model.dart';

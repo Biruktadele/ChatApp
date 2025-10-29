@@ -1,7 +1,7 @@
 import '../../domain/entities/user.dart';
 
 class UserModel extends User {
-  const UserModel({
+  UserModel({
     required super.id,
     required super.username,
     required super.email,
@@ -46,9 +46,9 @@ class UserModel extends User {
       lastName: json['lastName'] ?? '',
       lastlogin: json['lastlogin'] ?? '',
       dateJoined: json['dateJoined'] ?? '',
-      phoneNumber: json['phoneNumber'] ?? '',
+      phoneNumber: json['phone_number'] ?? '',
       bio: json['bio'] ?? '',
-      birthDate: json['birthDate'] ?? '',
+      birthDate: json['birthday'] ?? '',
       gender: json['gender'] ?? '',
     );
   }

@@ -46,3 +46,26 @@ final class GetAllUsers extends AuthEvent {
   @override
   List<Object?> get props => [];
 }
+
+final class LoadMeEvent extends AuthEvent {
+  const LoadMeEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
+final class UpdatePhotoEvent extends AuthEvent {
+  final Uint8List photoBytes;
+  const UpdatePhotoEvent(this.photoBytes);
+
+  @override
+  List<Object?> get props => [photoBytes];
+}
+final class UpdateMeEvent extends AuthEvent {
+  final String field;
+  final String value;
+  const UpdateMeEvent(this.field, this.value);
+
+  @override
+  List<Object?> get props => [field, value];
+}

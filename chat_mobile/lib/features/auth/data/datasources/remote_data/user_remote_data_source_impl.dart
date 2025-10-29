@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
-import '../../../../../core/constant/api_constatn.dart';
+import '../../../../../core/constant/api_constant.dart';
 import '../../../domain/entities/user.dart';
 import '../../models/user_model.dart';
 import 'user_remote_data_source.dart';
@@ -139,5 +139,77 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
     } else {
       throw Exception('Failed to fetch users: ${response.body}');
     }
+  }
+
+  @override
+  Future<User> me() async {
+    final token = await getToken();
+    if (token == null) {
+      throw Exception('No authentication token found');
+    }
+    final response = await client.get(
+      Uri.parse('$baseUrl/users/me/'),
+      headers: {...defaultHeaders, 'Authorization': 'Bearer $token'},
+    );
+      debugPrint('🪂Fetching current user: ${response.body}');
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final data = jsonDecode(response.body);
+
+      return UserModel.fromJson(data);
+    } else {
+      throw Exception('Failed to fetch user: ${response.body}');
+    }
+  }
+
+  @override
+  Future<User> updateMe(String field, String value) async {
+    final token = await getToken();
+    if (token == null) {
+      throw Exception('No authentication token found');
+    }
+    final response = await client.patch(
+      Uri.parse('$baseUrl/users/me/'),
+      headers: {...defaultHeaders, 'Authorization': 'Bearer $token'},
+      body: jsonEncode({field: value}),
+    );
+    debugPrint('🪂Updating user field ${response.body}');
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final data = jsonDecode(response.body);
+      return UserModel.fromJson(data);
+    } else {
+      throw Exception('Failed to update user: ${response.body}');
+    }
+  }
+
+  @override
+  Future<User> updatePhoto(Uint8List photoBytes) async {
+    final token = await getToken();
+    if (token == null) {
+      throw Exception('No authentication token found');
+    }
+
+    var request = http.MultipartRequest(
+      'PATCH',
+      Uri.parse('$baseUrl/users/me/'),
+    );
+
+    request.headers['Authorization'] = 'Bearer $token';
+
+    var file = http.MultipartFile.fromBytes(
+      'avatar',
+      photoBytes,
+      filename: 'profile_photo.jpg',
+    );
+
+    request.files.add(file);
+
+    var response = await request.send();
+
+    if (response.statusCode != 200) {
+      final responseBody = await response.stream.bytesToString();
+      throw Exception('Failed to update photo: $responseBody');
+    }
+    final responseBody = await response.stream.bytesToString();
+    return UserModel.fromJson(jsonDecode(responseBody));
   }
 }

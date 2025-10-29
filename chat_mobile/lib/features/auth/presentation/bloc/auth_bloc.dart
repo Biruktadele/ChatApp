@@ -1,5 +1,8 @@
+import 'dart:typed_data';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
 import '../../../../core/error/failure.dart';
@@ -18,6 +21,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LoginUser>(_onLoginUser);
     on<RegisterUser>(_onRegisterUser);
     on<GetAllUsers>(_onGetAllUsers);
+    on<LoadMeEvent>(_onLoadMeEvent);
+    on<UpdatePhotoEvent>(_onUpdatePhotoEvent);
+    on<UpdateMeEvent>(_onUpdateMeEvent);
   }
 
 
@@ -74,4 +80,36 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       (users) => emit(GetAllUsersSuccess(users)),
     );
   }
+  Future<void> _onLoadMeEvent(LoadMeEvent event, Emitter<AuthState> emit) async {
+    emit(const MeLoadingState());
+    debugPrint('🪂 Loading current user data');
+    final result = await userRepository.me();
+
+    result.fold(
+      (failure) => emit(MeFailureState(failure)),
+      (user) => emit(MeSuccessState(user)),
+    );
+  }
+
+  Future<void> _onUpdatePhotoEvent(UpdatePhotoEvent event, Emitter<AuthState> emit) async {
+    emit(const MeLoadingState());
+
+    final result = await userRepository.updatePhoto(event.photoBytes);
+
+    result.fold(
+      (failure) => emit(MeFailureState(failure)),
+      (user) => emit(UpdatePhotoState(user)),
+    );
+  }
+  Future<void> _onUpdateMeEvent(UpdateMeEvent event, Emitter<AuthState> emit) async {
+    emit(const MeLoadingState());
+
+    final result = await userRepository.updateMe(event.field, event.value);
+
+    result.fold(
+      (failure) => emit(MeFailureState(failure)),
+      (user) => emit(UpdateMeState(user)),
+    );
+  }
+
 }

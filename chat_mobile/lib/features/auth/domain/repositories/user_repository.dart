@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/error/failure.dart';
@@ -8,6 +10,8 @@ abstract class UserRepository {
   Future<Either<Failure, User>> registerUser(User user);
   Future<Either<Failure, User>> loginUser(User user);
   Future<Either<Failure, String>> getToken();
-  // Future<Either<Failure, User>> getUser();
   Future<Either<Failure, List<User>>> getAllUsers();
+  Future<Either<Failure, User>> me();
+  Future<Either<Failure, User>> updateMe(String field, String value);
+  Future<Either<Failure, User>> updatePhoto(Uint8List photoBytes);
 }

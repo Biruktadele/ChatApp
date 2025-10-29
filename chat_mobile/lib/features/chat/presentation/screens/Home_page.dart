@@ -1,17 +1,15 @@
 // ignore: file_names
 
-
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import '../../../auth/presentation/page/Profile_screen.dart';
 import '../../domain/entities/chat.dart';
 import '../bloc/bloc/chat_bloc.dart';
+import '../widgets/main_home/animated_app_bar.dart';
 import 'page/feverite.dart';
 import 'page/home_chat_page.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import '../bloc/bloc/chat_bloc.dart';
+import '../widgets/main_home/hidden_drawer.dart';
+import 'page/settings_page.dart';
 
 class HomePage extends StatefulWidget {
   final String username;
@@ -23,46 +21,101 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  List<Chat> chats = [];
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
+  int _selectedIndex = 0;
+  bool _isDarkMode = false;
+  late AnimationController _drawerController;
 
-  int pindex = 0;
+  void _onMenuItemTap(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    Navigator.pop(context);
+  }
 
-  // late SocketIoChatSocketService _socketService;
-  @override 
+  void _onLogout() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              // TODO: Implement actual logout logic
+              Navigator.pop(context); // Close dialog
+            },
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     Future.microtask(() {
       context.read<ChatBloc>().add(LoadChats());
     });
-    List<Widget> pages = [HomeChatPage(username: widget.username) , FeveritePage() ];
-
+    List<Widget> pages = [
+      HomeChatPage(username: widget.username),
+      ProfileScreen(onBack: () {}),
+      SettingsPage(),
+    ];
 
     return Scaffold(
-
-      
-      appBar: AppBar(
-        title: const Text('Home Page', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.transparent,
-      ),
-      body: pages[pindex],
-
-      bottomNavigationBar: CurvedNavigationBar(
-        backgroundColor: Colors.transparent,
-        color: Colors.grey.shade800,
-        buttonBackgroundColor: Colors.grey.shade800,
-        height: 50,
-        items: const <Widget>[
-          Icon(Icons.home, size: 30, color: Colors.white),
-          Icon(Icons.favorite, size: 30, color: Colors.white),
-          Icon(Icons.person, size: 30, color: Colors.white),
-        ],
-        onTap: (index) {
-          // Handle button tap if needed
-          setState(() {
-            pindex = index;
-          });
+      drawer: HiddenDrawer(
+        onMenuItemTap: (index) {
+          setState(() => _selectedIndex = index);
         },
       ),
+      appBar: AnimatedAppBar(
+        title: _selectedIndex == 0
+            ? 'Home'
+            : _selectedIndex == 1
+            ? 'Profile'
+            : _selectedIndex == 2
+            ? 'Settings'
+            : 'Settings',
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(_isDarkMode ? Icons.dark_mode : Icons.light_mode),
+            onPressed: () => setState(() => _isDarkMode = !_isDarkMode),
+          ),
+          IconButton(icon: const Icon(Icons.logout), onPressed: _onLogout),
+        ],
+        animation: AlwaysStoppedAnimation(1.0),
+      ),
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 400),
+        child: pages[_selectedIndex],
+      ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _drawerController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+  }
+
+  @override
+  void dispose() {
+    _drawerController.dispose();
+    super.dispose();
   }
 }

@@ -17,7 +17,10 @@ import 'features/auth/domain/repositories/user_repository.dart';
 import 'features/auth/domain/usecases/get_all_user.dart';
 import 'features/auth/domain/usecases/login_user.dart';
 import 'features/auth/domain/usecases/logout_user.dart';
+import 'features/auth/domain/usecases/me_usecase.dart';
 import 'features/auth/domain/usecases/register_user.dart';
+import 'features/auth/domain/usecases/update_me_usecase.dart';
+import 'features/auth/domain/usecases/update_photo_usecase.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/chat/data/datasources/localdata/local_data_source.dart';
 import 'features/chat/data/datasources/localdata/local_data_source_impl.dart';
@@ -75,6 +78,9 @@ void initAuth() {
   sl.registerLazySingleton(() => RegisterUserUsecase(sl()));
   sl.registerLazySingleton(() => LogoutUserUsecase(sl()));
   sl.registerLazySingleton(() => GetAllUsersUsecase(sl()));
+  sl.registerLazySingleton(() => MeUsecase(sl()));
+  sl.registerLazySingleton(() => UpdateMeUsecase(sl()));
+  sl.registerLazySingleton(() => UpdatePhotoUsecase(sl()));
 
   sl.registerLazySingleton<UserRepository>(
     () => UserRepositoryImpl(
@@ -105,6 +111,7 @@ void initChat() {
   sl.registerLazySingleton(() => DeleteChatUsecase(sl()));
   sl.registerLazySingleton(() => GetMessagesUsecase(sl()));
   sl.registerLazySingleton(() => DeleteMessageUsecase(sl()));
+  
   
 
   // Repository

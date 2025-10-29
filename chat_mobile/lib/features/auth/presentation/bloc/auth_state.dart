@@ -91,3 +91,36 @@ final class GetAllUsersFailure extends AuthState {
   @override
   List<Object?> get props => [failure]; 
 }
+
+
+//////Me//////
+final class MeLoadingState extends AuthState {
+  const MeLoadingState();
+}
+final class MeSuccessState extends AuthState {
+  final User user;
+  const MeSuccessState(this.user);
+
+  @override
+  List<Object?> get props => [user];
+}
+
+final class MeFailureState extends AuthState {
+  final Failure failure;
+  const MeFailureState(this.failure);
+
+  @override
+  List<Object?> get props => [failure];
+}
+final class UpdateMeState extends AuthState {
+  final User user;
+  const UpdateMeState(this.user);
+  @override
+  List<Object?> get props => [user];
+}
+final class UpdatePhotoState extends AuthState {
+  final User user;
+  const UpdatePhotoState(this.user);
+  @override
+  List<Object?> get props => [user];
+}

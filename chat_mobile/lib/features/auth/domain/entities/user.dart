@@ -2,21 +2,21 @@
 import 'package:equatable/equatable.dart';
 
 class User extends Equatable {
-  final int? id;
-  final String? username;
-  final String? email;
-  final String? password;
-  final String? avatar;
-  final String? firstName;
-  final String? lastName;
-  final String? lastlogin;
-  final String? dateJoined;
-  final String? phoneNumber;
-  final String? bio;
-  final String? birthDate;
-  final String? gender;
+  String? username;
+  int? id;
+  String? email;
+  String? password;
+  String? avatar;
+  String? firstName;
+  String? lastName;
+  String? lastlogin;
+  String? dateJoined;
+  String? phoneNumber;
+  String? bio;
+  String? birthDate;
+  String? gender;
 
-  const User({
+  User({
     this.id,
     this.username,
     this.email,

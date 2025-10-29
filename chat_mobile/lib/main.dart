@@ -4,12 +4,12 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'core/constant/color_const.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/auth/presentation/page/Profile_screen.dart';
 import 'features/auth/presentation/page/login_page.dart';
 import 'features/auth/presentation/page/sign_up_page.dart';
 import 'features/chat/presentation/bloc/bloc/chat_bloc.dart';
 import 'features/chat/presentation/screens/Home_page.dart';
 // import 'features/chat/presentation/screens/profile_page.dart';
-import 'features/chat/presentation/screens/Profile_screen.dart';
 import 'features/chat/presentation/screens/temptry/home_chat_screen.dart';
 import 'injection_container.dart' as di;
 
@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
 
             home: token.isNotEmpty ? HomePage(username: username , token: token ) : const LoginPage(),
-            // home: HomeChatScreen(),
+            // home: ProfileScreen(onBack: (){}),
           ),
         );
       },
